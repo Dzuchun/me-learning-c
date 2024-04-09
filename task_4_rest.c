@@ -83,6 +83,7 @@ enum InputType {
     Minus,   // '-'
     Star,    // '*'
     Slash,   // '/'
+    Percent, // '%'
     Eof,     // THE end
     Unknown, // couldn't recognize the input :(
 };
@@ -144,6 +145,12 @@ enum InputType read_next() {
         // that's a slash operator!
         input_forget(i + 1);
         return Slash;
+    }
+
+    if (c == '%') {
+        // that's a percent operator!
+        input_forget(i + 1);
+        return Percent;
     }
 
     if (c == '+') {
@@ -235,6 +242,16 @@ int main() {
             }
             op1 = pop_oprd();
             put_oprd(op1 / op2);
+            break;
+        case Percent:
+            // perform modulo
+            op2 = pop_oprd();
+            if (op2 == 0.0) {
+                fprintf(stderr, "\tCan't take modulo by 0\n");
+                return -1;
+            }
+            op1 = pop_oprd();
+            put_oprd((double)((int)op1 % (int)op2));
             break;
         case Unknown:
             // print to stderr
