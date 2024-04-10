@@ -2,6 +2,9 @@
 // calculator)
 //
 // Hope to implement at least a couple
+//
+// NOTE: this code intentionally avoids using std library. the point is to get
+// accustomed to the language, not fast developing
 
 #include <ctype.h>
 #include <stdio.h>
@@ -56,25 +59,25 @@ void input_clear() { inpe = 0; }
 #define MAX_OPERANDS 100
 /* This is an operand stack */
 double oprds[MAX_OPERANDS];
-int oprptr = -1;
+int oprptr = 0;
 
 /* gets an operand from stack, or warns are returns 42.0, if none is available
  */
 double pop_oprd() {
-    if (oprptr < 0) {
+    if (oprptr <= 0) {
         fprintf(stderr, "\tThere are no operands present, so have a 42.0\n");
         return 42.0;
     } else
-        return oprds[oprptr--];
+        return oprds[--oprptr];
 }
 
 /* Puts operand on a stack, for later use */
 void put_oprd(double oprd) {
-    if (oprptr >= MAX_OPERANDS - 1)
+    if (oprptr >= MAX_OPERANDS)
         fprintf(stderr, "\tOperand buffer overflow! Discarded operand: %f\n",
                 oprd);
     else
-        oprds[++oprptr] = oprd;
+        oprds[oprptr++] = oprd;
 }
 
 enum InputType {
@@ -84,6 +87,10 @@ enum InputType {
     Star,    // '*'
     Slash,   // '/'
     Percent, // '%'
+    Top,     // print 2 top elements
+    Dup,     // duplicate top element
+    Swp,     // swap 2 top elements
+    Clr,     // clears the stack
     Eof,     // THE end
     Unknown, // couldn't recognize the input :(
 };
@@ -115,6 +122,20 @@ double parse_double(int i) {
         mantice /= 10;
     // return the result
     return mantice;
+}
+
+int match_word(int i, const char *word) {
+    int c, t, j;
+    for (j = 0; (c = input_get(i)) != EOF && c == (t = word[j]) && t != '\0';
+         ++i, ++j)
+        ;
+    if (t != '\0') {
+        // match had failed.
+        return 0;
+    }
+    // forget the input until word's last char
+    input_forget(i);
+    return 1;
 }
 
 /*
@@ -153,6 +174,24 @@ enum InputType read_next() {
         return Percent;
     }
 
+    if (match_word(i, "top")) {
+        // that's a top operator!
+        // (unput was forgorren already)
+        return Top;
+    }
+
+    if (match_word(i, "dup")) {
+        return Dup;
+    }
+
+    if (match_word(i, "swp")) {
+        return Swp;
+    }
+
+    if (match_word(i, "clr")) {
+        return Clr;
+    }
+
     if (c == '+') {
         c = input_get(++i);
         if (!isdigit(c)) {
@@ -185,7 +224,8 @@ enum InputType read_next() {
 int main() {
     enum InputType type;
     double op1, op2;
-    while ((type = read_next()) != Eof) {
+    while (1) {
+        type = read_next();
         // This was used for debug
         /*
         switch (type) {
@@ -210,6 +250,9 @@ int main() {
         }
         */
         switch (type) {
+        case Eof:
+            // break out of the cycle
+            goto end;
         case Operand:
             // do nothing. was already added to the stack
             break;
@@ -253,12 +296,53 @@ int main() {
             op1 = pop_oprd();
             put_oprd((double)((int)op1 % (int)op2));
             break;
+        case Top:
+            // reaction depends on number of elements in the stack
+            switch (oprptr) {
+            case 0:
+                // there are no elements
+                // complete disaster
+                fprintf(stdout, "There are no operands in the stack\n");
+                break;
+            case 1:
+                // there's only one element
+                fprintf(stdout, "There's a single operand in the stack: %f\n",
+                        oprds[oprptr - 1]);
+                break;
+            default:
+                // there are at least 2 elements!
+                fprintf(stdout, "Last operands in the stack: [.., %f, %f]\n",
+                        oprds[oprptr - 2], oprds[oprptr - 1]);
+                break;
+            }
+            break;
+        case Swp:
+            if (oprptr < 2)
+                fprintf(stdout, "Can't swp top operands: there are 0 or 1 "
+                                "operands in the stack\n");
+            else {
+                op1 = oprds[oprptr - 1];
+                oprds[oprptr - 1] = oprds[oprptr - 2];
+                oprds[oprptr - 2] = op1;
+            }
+            break;
+        case Dup:
+            if (oprptr < 1)
+                fprintf(stdout, "Can't dup top operand, as there are no "
+                                "operands in the stack");
+            else
+                put_oprd(oprds[oprptr - 1]);
+            break;
+        case Clr:
+            oprptr = 0;
+            break;
         case Unknown:
             // print to stderr
             fprintf(stderr, "\tGot unknown input!\n");
             break;
         }
     }
+end:
     // in the end, print to operand in the stack
     printf("Answer to everything is %f\n", pop_oprd());
 }
