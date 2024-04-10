@@ -86,9 +86,9 @@ enum InputType {
     Dup,     // duplicate top element
     Swp,     // swap 2 top elements
     Clr,     // clears the stack
-    Sin,     // stdlib sin
-    Exp,     // stdlib exp
-    Pow,     // stdlib pow
+    Sin,     // sin library function
+    Exp,     // exp library function
+    Pow,     // pow library function
     Eof,     // THE end
     Unknown, // couldn't recognize the input :(
 };
@@ -200,12 +200,15 @@ fetch:
     if (match_word(i, "clr")) {
         return Clr;
     }
+
     if (match_word(i, "sin")) {
         return Sin;
     }
+
     if (match_word(i, "exp")) {
         return Exp;
     }
+
     if (match_word(i, "pow")) {
         return Pow;
     }
@@ -242,9 +245,31 @@ fetch:
 int main() {
     enum InputType type;
     double op1, op2, sin(double), exp(double), pow(double, double);
-
-    for (;;) {
+    while (1) {
         type = read_next();
+        // This was used for debug
+        /*
+        switch (type) {
+        case Operand:
+            printf("Operand: %f\n", pop_oprd());
+            break;
+        case Plus:
+            printf("Plus\n");
+            break;
+        case Minus:
+            printf("Minus\n");
+            break;
+        case Star:
+            printf("Star\n");
+            break;
+        case Slash:
+            printf("Slash\n");
+            break;
+        case Unknown:
+            printf("Unknown input received\n");
+            break;
+        }
+        */
         switch (type) {
         case Eof:
             // break out of the cycle
@@ -355,8 +380,8 @@ int main() {
             oprptr = 0;
             break;
         case Unknown:
-            // notify
-            fprintf(stderr, "\tThat was not a correct input\n");
+            // print to stderr
+            fprintf(stderr, "\tGot unknown input!\n");
             break;
         }
     }
