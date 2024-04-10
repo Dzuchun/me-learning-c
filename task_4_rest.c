@@ -7,6 +7,7 @@
 // accustomed to the language, not fast developing
 
 #include <ctype.h>
+#include <math.h>
 #include <stdio.h>
 
 #define INPBUF_SIZE 100
@@ -91,6 +92,9 @@ enum InputType {
     Dup,     // duplicate top element
     Swp,     // swap 2 top elements
     Clr,     // clears the stack
+    Sin,     // sin library function
+    Exp,     // exp library function
+    Pow,     // pow library function
     Eof,     // THE end
     Unknown, // couldn't recognize the input :(
 };
@@ -192,6 +196,18 @@ enum InputType read_next() {
         return Clr;
     }
 
+    if (match_word(i, "sin")) {
+        return Sin;
+    }
+
+    if (match_word(i, "exp")) {
+        return Exp;
+    }
+
+    if (match_word(i, "pow")) {
+        return Pow;
+    }
+
     if (c == '+') {
         c = input_get(++i);
         if (!isdigit(c)) {
@@ -223,7 +239,7 @@ enum InputType read_next() {
 
 int main() {
     enum InputType type;
-    double op1, op2;
+    double op1, op2, sin(double), exp(double), pow(double, double);
     while (1) {
         type = read_next();
         // This was used for debug
@@ -335,6 +351,26 @@ int main() {
             break;
         case Clr:
             oprptr = 0;
+            break;
+        case Sin:
+            put_oprd(sin(pop_oprd()));
+            break;
+        case Exp:
+            put_oprd(exp(pop_oprd()));
+            break;
+        case Pow:
+            op2 = pop_oprd();
+            op1 = pop_oprd();
+            // matmatecally, real power function is defined for non-negative
+            // base only
+            if (op1 < 0.0)
+                fprintf(stderr, "\tAttempt to raise negative value to a power. "
+                                "That's not supported\n");
+            else if (op1 == 0.0 && op2 < 0)
+                fprintf(stderr, "\tAttempt to raise zero toa negative power, "
+                                "that's not supported.\n");
+            else
+                put_oprd(pow(op1, op2));
             break;
         case Unknown:
             // print to stderr
