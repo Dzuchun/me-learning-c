@@ -1,0 +1,22 @@
+// source: https://dev.to/iggredible/debugging-in-vim-with-vimspector-4n0m
+{
+  "configurations": {
+    "run": {
+      "adapter": "CodeLLDB",
+      "breakpoints": {
+        "exception": {
+          "all": "N",
+          "uncaught": "N"
+        }
+      },
+      "configuration": {
+        "request": "launch",
+        "protocol": "auto",
+        "stopOnEntry": true,
+        "console": "integratedTerminal",
+        "program": "${workspaceRoot}/a.out",
+        "cwd": "${workspaceRoot}"
+      }
+    }
+  }
+}
