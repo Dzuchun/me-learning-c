@@ -1,4 +1,6 @@
+#include <ctype.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 // copied from task-1-19
 /* reads line from input. retuns EOF, if EOF was hit. newline character at the
@@ -53,7 +55,28 @@ int lex_cmp(char *s1, char *s2) {
     return (!c1 && !c2) ? 0 : c1 - c2;
 }
 
-void sort_lines(char **buf, int left, int right) {
+int num_cmp(char *s1, char *s2) {
+    double v1 = atof(s1), v2 = atof(s2);
+    return (v1 > v2) ? 1 : (v1 == v2) ? 0 : -1;
+}
+
+int dir_cmp(char *s1, char *s2) {
+    char c1 = *s1++, c2 = *s2++;
+    for (;;) {
+        while (c1 != '\0' && !isalnum(c1) && !isblank(c1))
+            c1 = *s1++;
+        while (c2 != '\0' && !isalnum(c2) && !isblank(c2))
+            c2 = *s2++;
+        if (c1 != c2)
+            return c1 - c2;
+        if (c1 == '\0')
+            return 0;
+        c1 = *s1++;
+        c2 = *s2++;
+    }
+}
+
+void sort_lines(char **buf, int left, int right, int (*comp)(void *, void *)) {
     int i, last;
     if (left >= right)
         return;
@@ -61,14 +84,14 @@ void sort_lines(char **buf, int left, int right) {
     swap(char *, buf[left], buf[last]);
     last = left;
     for (i = left + 1; i <= right; ++i)
-        if (lex_cmp(buf[i], buf[left]) < 0) {
+        if ((*comp)(buf[i], buf[left]) < 0) {
             ++last;
             swap(char *, buf[last], buf[i]);
         }
 
     swap(char *, buf[left], buf[last]);
-    sort_lines(buf, left, last - 1);
-    sort_lines(buf, last + 1, right);
+    sort_lines(buf, left, last - 1, comp);
+    sort_lines(buf, last + 1, right, comp);
 }
 
 int main() {
@@ -79,7 +102,8 @@ int main() {
         buf[lines] = &raw_buf[lines * (MAX_LINE_LENGTH + 1)];
     buf[MAX_LINES] = NULL;
 
+    // freopen("./task_5_7.c", "r", stdin);
     lines = read_lines((char **)buf, MAX_LINES, MAX_LINE_LENGTH);
-    sort_lines((char **)buf, 0, lines - 1);
+    sort_lines((char **)buf, 0, lines - 1, (int (*)(void *, void *))dir_cmp);
     print_lines((char **)buf, lines - 1, MAX_LINE_LENGTH);
 }
