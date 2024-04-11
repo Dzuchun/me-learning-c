@@ -1,61 +1,56 @@
 #include <stdio.h>
 
-#define MAX_LEN 100
+/* finds end of the passed string */
+#define find_end(s)                                                            \
+                                                                               \
+    char *s##_end = s;                                                         \
+    while (*s##_end)                                                           \
+        s##_end++;                                                             \
+    s##_end--;
 
-int string_length(int s[]) {
-    int len;
-    len = 0;
-    while (s[len] != '\0')
-        len += 1;
-    // len is at a NULL-charater position
-    return len;
-}
-
-void swap(int s[], int ind1, int ind2) {
-    int tmp;
-    tmp = s[ind1];
-    s[ind1] = s[ind2];
-    s[ind2] = tmp;
-}
-
-void reverse_string(int s[]) {
-    int len, i;
-    len = string_length(s);
-    for (i = 0; i <= len / 2; i += 1)
-        swap(s, i, len - i - 1);
-}
-int read_line(int line[]) {
-    int i, c;
-    i = 0;
-    while ((c = getchar()) != EOF) {
-        if (c == '\n')
-            break;
-        line[i] = c;
-        i += 1;
-        if (i == (MAX_LEN - 1))
-            break;
+/* swaps data under passed pointers of specific type */
+#define swap(t, p1, p2)                                                        \
+    {                                                                          \
+        t tmp = *p1;                                                           \
+        *p1 = *p2;                                                             \
+        *p2 = tmp;                                                             \
     }
-    line[i] = '\0';
-    if (c == EOF)
-        return -1;
-    return i;
+// wow, this formatting really surprised me. that was cool.
+
+/* reverses string in-place */
+void reverse_string(char *s) {
+    find_end(s);
+    while (s < s_end) {
+        swap(char, s, s_end);
+        s++;
+        s_end--;
+    }
 }
 
-void print_line(int line[]) {
-    int i;
-    for (i = 0; i < MAX_LEN; i += 1) {
-        if (line[i] == '\0')
-            break;
-        putchar(line[i]);
+/* reads line from input. retuns EOF, if EOF was hit. newline character at the
+ * end is not included */
+int read_line(char *buf, int cap) {
+    char c;
+    while (cap-- && (c = getchar()) != EOF && c != '\n')
+        *buf++ = c;
+    *buf = '\0';
+    return (c != EOF) ? 0 : EOF;
+}
+
+/* prints line to the output, followed by a newline */
+void print_line(char *buf, int cap) {
+    while (cap-- && *buf) {
+        putchar(*buf++);
     }
     putchar('\n');
 }
 
+#define MAX_LEN 100
+
 int main() {
-    int len;
-    int buf[MAX_LEN];
-    while ((len = read_line(buf)) >= 0) {
+    char buf[MAX_LEN];
+    while (read_line(buf, MAX_LEN) != EOF) {
         reverse_string(buf);
-        print_line(buf);
+        print_line(buf, MAX_LEN);
     }
 }
