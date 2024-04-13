@@ -1,11 +1,16 @@
 # What's this?
 
-I try to learn C, alright? To do that, I decided to go through [The C programming Language][book] 2nd edition published in 1988.
+I try to learn C, alright?
 
-Why is it this book exatly? Idk, it's just whatever seemed alright in the search :idk:
+## C Programming Language[^book]
 
-I aknowledge, that 240 pages is not nearly enough to master C. So I'll probably keep learning after I finish this book (also might want to check something dating less than 40 years :3 )
+First, I've looked through this book and solved a couple of tasks presented there.
 
-These are my first-ever C programs. I like to save stuff like that, to clearly see my progress in the subject.
+I feel kinda confident after such practice.
 
-[book]: https://venkivasamsetti.github.io/ebookworm.github.io/Books/cse/C%20Programming%20Language%20(2nd%20Edition).pdf
+## Frontier
+
+I've yet to decide on my next steps. I have a small project in mind, but I might want to study various libraries more.
+
+
+[^book]: [The C programming Language][book] 2nd edition published in 1988. Sourced [here](https://venkivasamsetti.github.io/ebookworm.github.io/Books/cse/C%20Programming%20Language%20(2nd%20Edition).pdf)
