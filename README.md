@@ -20,4 +20,5 @@ I've yet to decide on my next steps. I have a small project in mind, but I might
 
 
 [^book]: [The C programming Language][book] 2nd edition published in 1988. Sourced [here](https://venkivasamsetti.github.io/ebookworm.github.io/Books/cse/C%20Programming%20Language%20(2nd%20Edition).pdf)
+
 [Moirai]: https://github.com/Dzuchun/moirai
